@@ -1,7 +1,3 @@
--- ===================================================================
--- --- PRIVATE ENGINE SERVICES (SCOPED LOCALLY FOR STEALTH) ---
--- ===================================================================
--- Keeping these local ensures they leave ZERO footprints in getgenv()
 local Workspace         = game:GetService("Workspace")
 local RunService        = game:GetService("RunService")
 local Players           = game:GetService("Players")
@@ -9,10 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CoreGui           = game:GetService("CoreGui")
 local HttpService       = game:GetService("HttpService")
 
--- ===================================================================
--- --- GLOBAL DEPENDENCY PIPELINES (FOR UI & FARM CODE) ---
--- ===================================================================
--- PLAYER ARCHITECTURE LIFECYCLE
 local lp = Players.LocalPlayer or Players.PlayerAdded:Wait()
 if not lp then
     while not Players.LocalPlayer do task.wait() end
@@ -34,8 +26,8 @@ getgenv().AdjustBackpackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitF
 getgenv().PlayAgainRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Misc"):WaitForChild("VotePlayAgain")
 
 -- STORAGE NAMES
-getgenv().FILE_NAME = "PrevRunData.txt"
-getgenv().CONFIG_FILE = "FarmConfig.txt"
+local FILE_NAME = "PrevRunData.txt"
+local CONFIG_FILE = "FarmConfig.txt"
 
 -- ULTRA-STEALTH UI CONTAINER ROUTING
 getgenv().TargetContainer = (gethui and gethui()) or (cloneref and cloneref(CoreGui)) or CoreGui
