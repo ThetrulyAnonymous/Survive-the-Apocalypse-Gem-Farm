@@ -463,7 +463,7 @@ local function DataManager()
         HungerLabel.Text = "Hunger: " .. tostring(math.round(hunger))
     end
     
-    Humanoid::GetPropertyChangedSignal("Health"):Connect(SyncHealth)
+    Humanoid:GetPropertyChangedSignal("Health"):Connect(SyncHealth)
     Character:GetAttributeChangedSignal("Hunger"):Connect(SyncHunger)
     LocalPlayer:GetAttributeChangedSignal("Gems"):Connect(SyncGem)
     
