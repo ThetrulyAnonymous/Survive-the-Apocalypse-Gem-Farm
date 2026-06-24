@@ -321,7 +321,7 @@ local function Main()
             if child.Name == "Fuel" then FuelLoaded = FuelLoaded + 1 end
         end
         if FuelLoaded >= 5 then break end
-        task.wait(0.2)
+        task.wait(0.1)
     end
     task.wait(0.5)
 
