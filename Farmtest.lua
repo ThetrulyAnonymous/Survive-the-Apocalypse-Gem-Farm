@@ -309,7 +309,6 @@ local function Main()
     Log("This is the V2 of the original gem farm script", "[NOTICE] : ")
     Log("===================================================================", "")
 
-    task.wait(0.3)
     humanoid:ChangeState(Enum.HumanoidStateType.Physics)
     GoDown()
     humanoid:ChangeState(Enum.HumanoidStateType.Running)
@@ -324,7 +323,7 @@ local function Main()
         if FuelLoaded >= 5 then break end
         task.wait(0.2)
     end
-    task.wait(1)
+    task.wait(0.5)
 
     Log("Starting the Farm", "[MAIN] : ")
     Log("===================================================================", "")
