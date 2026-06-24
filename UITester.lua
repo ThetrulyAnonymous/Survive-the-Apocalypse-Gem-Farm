@@ -622,12 +622,15 @@ local WriteData = function(logString)
 end
 
 local function SwitchToTab(tabName)
+    local MainStroke = MainTabBtn:FindFirstChild("CyberStroke")
+    local PrevStroke = PrevTabBtn:FindFirstChild("CyberStroke")
+
     if tabName == "MAIN" then
-        MainTabBtn.UIStroke.Color = NEON_CYAN
+        if MainStroke then MainStroke.Color = NEON_CYAN end
         MainTabBtn.BackgroundColor3 = Color3.fromRGB(24, 33, 46)
         MainRotatedText.TextColor3 = NEON_CYAN
         
-        PrevTabBtn.UIStroke.Color = Color3.fromRGB(35, 45, 60)
+        if PrevStroke then PrevStroke.Color = Color3.fromRGB(35, 45, 60) end
         PrevTabBtn.BackgroundColor3 = Color3.fromRGB(18, 22, 30)
         PrevRotatedText.TextColor3 = Color3.fromRGB(120, 140, 160)
         
@@ -635,11 +638,11 @@ local function SwitchToTab(tabName)
         MapScreen.Visible = true
         PreviousRunsPanel.Visible = false
     elseif tabName == "PREV_RUNS" then
-        PrevTabBtn.UIStroke.Color = NEON_CYAN
+        if PrevStroke then PrevStroke.Color = NEON_CYAN end
         PrevTabBtn.BackgroundColor3 = Color3.fromRGB(24, 33, 46)
         PrevRotatedText.TextColor3 = NEON_CYAN
         
-        MainTabBtn.UIStroke.Color = Color3.fromRGB(35, 45, 60)
+        if MainStroke then MainStroke.Color = Color3.fromRGB(35, 45, 60) end
         MainTabBtn.BackgroundColor3 = Color3.fromRGB(18, 22, 30)
         MainRotatedText.TextColor3 = Color3.fromRGB(120, 140, 160)
         
