@@ -602,25 +602,6 @@ end
 
 task.spawn(RenderFileLogsToTab)
 
-local WriteData = function(logString)
-    local content = isfile(FILE_NAME) and readfile(FILE_NAME) or ""
-    local lines = string.split(content, "\n")
-    
-    local activeLogs = {}
-    for _, val in ipairs(lines) do
-        if val ~= "" then table.insert(activeLogs, val) end
-    end
-    
-    if #activeLogs >= 500 then
-        table.remove(activeLogs, 1)
-    end
-    
-    table.insert(activeLogs, logString)
-    
-    local savedString = table.concat(activeLogs, "\n") .. "\n"
-    writefile(FILE_NAME, savedString)
-end
-
 local function SwitchToTab(tabName)
     local MainStroke = MainTabBtn:FindFirstChild("CyberStroke")
     local PrevStroke = PrevTabBtn:FindFirstChild("CyberStroke")
