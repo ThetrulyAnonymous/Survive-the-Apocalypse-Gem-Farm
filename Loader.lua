@@ -1,48 +1,51 @@
--- GAME SERVICES
-local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CoreGui = game:GetService("CoreGui")
-local HttpService = game:GetService("HttpService")
-local HttpService = game:GetService("HttpService")
+getgenv().Workspace = game:GetService("Workspace")
+getgenv().RunService = game:GetService("RunService")
+getgenv().Players = game:GetService("Players")
+getgenv().ReplicatedStorage = game:GetService("ReplicatedStorage")
+getgenv().CoreGui = game:GetService("CoreGui")
+getgenv().HttpService = game:GetService("HttpService")
 
- 
 -- CONFIGURATION & REFERENCES
+local lp = Players.LocalPlayer
+if not lp then
+    while not Players.LocalPlayer do task.wait() end
+    lp = Players.LocalPlayer
+end
+getgenv().LocalPlayer = lp
 
-local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local MapFolder = Workspace:WaitForChild("Map")
-local TilesFolder = MapFolder:WaitForChild("Tiles")
-local DroppedItemsFolder = Workspace:WaitForChild("DroppedItems")
-local AdjustBackpackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Tools"):WaitForChild("AdjustBackpack")
-local PlayAgainRemote = ReplicatedStorage.Remotes.Misc:FindFirstChild("VotePlayAgain")
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:WaitForChild("Humanoid")
+getgenv().character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+getgenv().MapFolder = Workspace:WaitForChild("Map")
+getgenv().TilesFolder = MapFolder:WaitForChild("Tiles")
+getgenv().DroppedItemsFolder = Workspace:WaitForChild("DroppedItems")
+getgenv().AdjustBackpackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Tools"):WaitForChild("AdjustBackpack")
+getgenv().PlayAgainRemote = ReplicatedStorage.Remotes.Misc:FindFirstChild("VotePlayAgain")
+getgenv().humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+getgenv().humanoid = character:WaitForChild("Humanoid")
+
+-- ENVIRONMENT & FILES DATA
+getgenv().FILE_NAME = "PrevRunData.txt"
+getgenv().CONFIG_FILE = "FarmConfig.txt"
+getgenv().TargetContainer = gethui and gethui() or (cloneref and cloneref(CoreGui) or CoreGui)
 
 -- GAME DATA
-local Generator = nil
-local chosenBox = nil
-local success = nil
-local Vector3_zero = Vector3.new(0, 0, 0)
-local crawlRaycastParams = RaycastParams.new()
+getgenv().Generator = nil
+getgenv().chosenBox = nil
+getgenv().success = nil
+getgenv().Vector3_zero = Vector3.new(0, 0, 0)
+getgenv().crawlRaycastParams = RaycastParams.new()
 crawlRaycastParams.FilterType = Enum.RaycastFilterType.Exclude
 crawlRaycastParams.RespectCanCollide = false
 crawlRaycastParams.CollisionGroup = "Default"
 
-
 -- Files Setting up
-local FILE_NAME = "PrevRunData.txt"
-local CONFIG_FILE = "FarmConfig.txt"
-
-if not isfile(FILE_NAME) then writefile(FILE_NAME, "") end
-
-if not isfile(CONFIG_FILE) then
-    local defaultSettings = {HideNameActive = false, OptimisedFarmActive = false, KeySystem = false}
-    writefile(CONFIG_FILE, HttpService:JSONEncode(defaultSettings))
+if isfile and writefile then
+    if not isfile(FILE_NAME) then writefile(FILE_NAME, "") end
+    if not isfile(CONFIG_FILE) then
+        local defaultSettings = {HideNameActive = false, OptimisedFarmActive = false, KeySystem = false}
+        writefile(CONFIG_FILE, HttpService:JSONEncode(defaultSettings))
+    end
 end
 
--- Cleaning up Left-over GUI
-local TargetContainer = gethui and gethui() or (cloneref and cloneref(CoreGui) or CoreGui)
+-- Cleaning up Left-over GUI (Now safe because TargetContainer is initialized above!)
 local existingUI = TargetContainer:FindFirstChild("ApocalypseControlPanel")
 if existingUI then existingUI:Destroy() end
