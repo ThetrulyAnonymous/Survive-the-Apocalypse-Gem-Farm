@@ -26,8 +26,8 @@ getgenv().AdjustBackpackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitF
 getgenv().PlayAgainRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Misc"):WaitForChild("VotePlayAgain")
 
 -- STORAGE NAMES
-getgenv().FILE_NAME = "PrevRunData.txt"
-getgenv().CONFIG_FILE = "FarmConfig.txt"
+local FILE_NAME = "PrevRunData.txt"
+local CONFIG_FILE = "FarmConfig.txt"
 
 -- ULTRA-STEALTH UI CONTAINER ROUTING
 getgenv().TargetContainer = (gethui and gethui()) or (cloneref and cloneref(CoreGui)) or CoreGui
