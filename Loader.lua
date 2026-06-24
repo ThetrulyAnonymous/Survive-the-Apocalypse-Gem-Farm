@@ -27,16 +27,6 @@ getgenv().FILE_NAME = "PrevRunData.txt"
 getgenv().CONFIG_FILE = "FarmConfig.txt"
 getgenv().TargetContainer = gethui and gethui() or (cloneref and cloneref(CoreGui) or CoreGui)
 
--- GAME DATA
-getgenv().Generator = nil
-getgenv().chosenBox = nil
-getgenv().success = nil
-getgenv().Vector3_zero = Vector3.new(0, 0, 0)
-getgenv().crawlRaycastParams = RaycastParams.new()
-crawlRaycastParams.FilterType = Enum.RaycastFilterType.Exclude
-crawlRaycastParams.RespectCanCollide = false
-crawlRaycastParams.CollisionGroup = "Default"
-
 -- Files Setting up
 if isfile and writefile then
     if not isfile(FILE_NAME) then writefile(FILE_NAME, "") end
