@@ -14,47 +14,24 @@ if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
--- This is based on your pings so the finding fuel function doesn't break (adjust it to your liking)
+-- Timing calibration adjustment
 task.wait(3)
 
--- SERVICES --
-
---[[
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-]]
- 
--- --- CONFIGURATION & REFERENCES ---
---[[
-local LocalPlayer = Players.LocalPlayer
-local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-]]
 
+local MapFolder            = getgenv().MapFolder
+local DroppedItemsFolder   = getgenv().DroppedItemsFolder
+local PlayAgainRemote      = getgenv().PlayAgainRemote
+local humanoidRootPart     = getgenv().humanoidRootPart
+local humanoid             = getgenv().humanoid
+local character            = getgenv().character
+local LocalPlayer          = getgenv().LocalPlayer
 
-local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
- 
--- --- CONFIGURATION & REFERENCES ---
-
-local LocalPlayer = Players.LocalPlayer
-local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local MapFolder = Workspace:WaitForChild("Map")
-local DroppedItemsFolder = Workspace:WaitForChild("DroppedItems")
-local AdjustBackpackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Tools"):WaitForChild("AdjustBackpack")
-local PlayAgainRemote = ReplicatedStorage.Remotes.Misc:FindFirstChild("VotePlayAgain")
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:WaitForChild("Humanoid")
- 
 local Generator = nil
 local chosenBox = nil
-
 local success = nil
-
 local Vector3_zero = Vector3.new(0, 0, 0)
 local crawlRaycastParams = RaycastParams.new()
 crawlRaycastParams.FilterType = Enum.RaycastFilterType.Exclude
@@ -68,23 +45,22 @@ local function Log(message, linebreaker)
     end)
 end
  
--- --- Safety First Lads You gotta be the sneakiest to be the ultimate gem grinder ---
+-- --- Safety and Escape Protocols ---
 local function evacuateServer(reason)
     Log("EVACUATION SWITCH ACTIVATED! " .. reason, "[SECURITY] : ")
     task.spawn(function()
-      pcall(function() PlayAgainRemote:FireServer() end)
-      Log("ESCAPING BY PLAYING AGAIN!", "[SECURITY] : ")
-      task.wait(1.0) -- Waiting for the remote to work
+        pcall(function() PlayAgainRemote:FireServer() end)
+        Log("ESCAPING BY PLAYING AGAIN!", "[SECURITY] : ")
+        task.wait(1.0)
  
-      -- 2. Forceful escape by getting kicked if the remote is slow as heck
-      LocalPlayer:Kick("[WARNING] " .. reason)
+        -- Fallback escape mechanism
+        LocalPlayer:Kick("[WARNING] " .. reason)
     end)
  
-	-- Stops the script immediately
     error("Script Termination")
 end
 
--- Background functions that will run silently ---
+-- --- Background Environments ---
 local function SpawnPlatform()    
     local platform = Instance.new("Part")
     platform.Name = "UndergroundFarmFloor"
@@ -117,116 +93,111 @@ local function Noclip()
 end
 
 local function FindPowerBox()
-  local BoxData = {}
-  local tiles = MapFolder:WaitForChild("Tiles"):GetChildren()
-  local shortdist = math.huge
-  local BoxXZ = {0,0}
-  local currPos = humanoidRootPart.Position
+    local BoxData = {}
+    local tiles = MapFolder:WaitForChild("Tiles"):GetChildren()
+    local shortdist = math.huge
+    local BoxXZ = {0,0}
+    local currPos = humanoidRootPart.Position
 
-  for _, child in ipairs(tiles) do
-    if child.Name == "Power Plant" then
-      local powerBox = child:FindFirstChild("Power Box")
-      if powerBox then
-        local boxPos = powerBox:GetPivot().Position
-        local dist = (currPos - boxPos).Magnitude
+    for _, child in ipairs(tiles) do
+        if child.Name == "Power Plant" then
+            local powerBox = child:FindFirstChild("Power Box")
+            if powerBox then
+                local boxPos = powerBox:GetPivot().Position
+                local dist = (currPos - boxPos).Magnitude
 
-        if dist < shortdist then
-          shortdist = dist
-          chosenBox = powerBox
-          BoxXZ[1], BoxXZ[2] = boxPos.X, boxPos.Z
+                if dist < shortdist then
+                    shortdist = dist
+                    chosenBox = powerBox
+                    BoxXZ[1], BoxXZ[2] = boxPos.X, boxPos.Z
+                end
+            end
         end
-      end
     end
-  end
-  return BoxXZ
+    return BoxXZ
 end
  
 local function getGeneratorPosition()
-  local structures = Workspace:WaitForChild("Structures", 5)
-  local generator = structures and structures:WaitForChild("Generator", 5)
-  Generator = generator:GetPivot().Position
+    local structures = Workspace:WaitForChild("Structures")
+    local generator = structures and structures:WaitForChild("Generator")
+    if generator then
+        Generator = generator:GetPivot().Position
+    else
+        -- Fallback default positional estimate to prevent crashing the line
+        Generator = Vector3.new(0, 0, 0)
+    end
 end
 
 local excludeFuel = {}
 
 local function FindShortPath()
-  -- First, find all suitable fuels to add nodes to the network
-  local playerPos = humanoidRootPart.Position
-  local FuelVertices = {}
-  local children = DroppedItemsFolder:GetChildren()
+    local playerPos = humanoidRootPart.Position
+    local FuelVertices = {}
+    local children = DroppedItemsFolder:GetChildren()
 
-  for _, item in ipairs(children) do
-    if item.Name == "Fuel" and not excludeFuel[item] then
-      local fuelPos = item:GetPivot().Position
-      local height = fuelPos.Y - playerPos.Y
+    for _, item in ipairs(children) do
+        if item.Name == "Fuel" and not excludeFuel[item] then
+            local fuelPos = item:GetPivot().Position
+            local height = fuelPos.Y - playerPos.Y
 
-      if height > 0 and height <= 10 then
-        table.insert(FuelVertices, {Instance = item, Coord = {fuelPos.X, fuelPos.Z}})
-      else
-        excludeFuel[item] = true
-      end
-    end
-  end
-
-  -- Find the shortest path from start to two fuel to power box
-  local TwoNodes = {nil, nil}
-  local shortdist = math.huge
-  local BoxCoord = FindPowerBox()
-
-  local snodeX, snodeZ = playerPos.X, playerPos.Z
-  local enodeX, enodeZ = BoxCoord[1], BoxCoord[2]
-  for i = 1, #FuelVertices do
-    local fuel1 = FuelVertices[i]
-    local fuel1X, fuel1Z = fuel1.Coord[1], fuel1.Coord[2]
-
-    for j = i+1, #FuelVertices do
-      local fuel2 = FuelVertices[j]
-      local fuel2X, fuel2Z = fuel2.Coord[1], fuel2.Coord[2]
-      -- Find distance between two fuels
-      local TwoNodeDist = math.sqrt((fuel1X - fuel2X)^2 + (fuel1Z - fuel2Z)^2)
-      -- Choice 1: You -> Fuel 1 -> Fuel 2 -> Power Box
-      local dist1 = math.sqrt((snodeX - fuel1X)^2 + (snodeZ - fuel1Z)^2) + TwoNodeDist + math.sqrt((enodeX - fuel2X)^2 + (enodeZ - fuel2Z)^2)
-      -- Choice 2: You -> Fuel 2 -> Fuel 1 -> Power Box
-      local dist2 = math.sqrt((snodeX - fuel2X)^2 + (snodeZ - fuel2Z)^2) + TwoNodeDist + math.sqrt((enodeX - fuel1X)^2 + (enodeZ - fuel1Z)^2)
-
-      if dist1 < dist2 then
-        if dist1 < shortdist then
-          shortdist = dist1
-          TwoNodes[1] = fuel1.Instance
-          TwoNodes[2] = fuel2.Instance
+            if height > 0 and height <= 10 then
+                table.insert(FuelVertices, {Instance = item, Coord = {fuelPos.X, fuelPos.Z}})
+            else
+                excludeFuel[item] = true
+            end
         end
-      elseif dist2 < shortdist then
-        shortdist = dist2
-        TwoNodes[1] = fuel2.Instance
-        TwoNodes[2] = fuel1.Instance
-      end
     end
-  end
-  return TwoNodes
+
+    local TwoNodes = {nil, nil}
+    local shortdist = math.huge
+    local BoxCoord = FindPowerBox()
+
+    local snodeX, snodeZ = playerPos.X, playerPos.Z
+    local enodeX, enodeZ = BoxCoord[1], BoxCoord[2]
+    for i = 1, #FuelVertices do
+        local fuel1 = FuelVertices[i]
+        local fuel1X, fuel1Z = fuel1.Coord[1], fuel1.Coord[2]
+
+        for j = i+1, #FuelVertices do
+            local fuel2 = FuelVertices[j]
+            local fuel2X, fuel2Z = fuel2.Coord[1], fuel2.Coord[2]
+            
+            local TwoNodeDist = math.sqrt((fuel1X - fuel2X)^2 + (fuel1Z - fuel2Z)^2)
+            local dist1 = math.sqrt((snodeX - fuel1X)^2 + (snodeZ - fuel1Z)^2) + TwoNodeDist + math.sqrt((enodeX - fuel2X)^2 + (enodeZ - fuel2Z)^2)
+            local dist2 = math.sqrt((snodeX - fuel2X)^2 + (snodeZ - fuel2Z)^2) + TwoNodeDist + math.sqrt((enodeX - fuel1X)^2 + (enodeZ - fuel1Z)^2)
+
+            if dist1 < dist2 then
+                if dist1 < shortdist then
+                    shortdist = dist1
+                    TwoNodes[1] = fuel1.Instance
+                    TwoNodes[2] = fuel2.Instance
+                end
+            elseif dist2 < shortdist then
+                shortdist = dist2
+                TwoNodes[1] = fuel2.Instance
+                TwoNodes[2] = fuel1.Instance
+            end
+        end
+    end
+    return TwoNodes
 end
 
--- The more overpowered version, it can literally teleport fuel to the generator (People gonna skid this thing hard trust me)
 local function FuelTeleport(targetFuel) 
     local fuelUnion = targetFuel:FindFirstChild("Union") or targetFuel.PrimaryPart
     local itemDrag = targetFuel:FindFirstChild("ItemDrag")
     local networkRemote = itemDrag and itemDrag:FindFirstChild("RequestNetworkOwnership")
  
     if fuelUnion and networkRemote then
-        -- Hippity Hoppity the fuel is now my property
         pcall(function()
             networkRemote:FireServer(fuelUnion)
         end)
-        -- small delay so it doesn't blow up
         task.wait(0.1) 
         pcall(function()
             targetFuel:PivotTo(CFrame.new(Generator) + Vector3.new(0, 1, 0))
         end)
-
         task.wait(0.15) 
     end
 end
-
-local RunService = game:GetService("RunService")
 
 local function GoTo(targetPos)
     local lockedYHeight = humanoidRootPart.Position.Y
@@ -241,7 +212,6 @@ local function GoTo(targetPos)
         local remainingVector = finalTarget - currentPos
         local totalDistance = math.sqrt(remainingVector.X^2 + remainingVector.Z^2)
         
-        -- Arrival check
         if totalDistance <= 2 then
             humanoidRootPart.CFrame = CFrame.new(finalTarget)
             humanoidRootPart.AssemblyLinearVelocity = Vector3_zero
@@ -254,7 +224,6 @@ local function GoTo(targetPos)
         
         local direction = remainingVector.Unit
         
-        -- Wall prediction raycast (6 studs ahead)
         local rayResult = Workspace:Raycast(currentPos, direction * 6, crawlRaycastParams)
         if rayResult and rayResult.Instance then
             local parentModel = rayResult.Instance:FindFirstAncestorOfClass("Model")
@@ -263,22 +232,18 @@ local function GoTo(targetPos)
             end
         end
         
-        -- Determine physical speed (studs per second)
         local currentAllowedSpeed = 10
         if os.clock() - lastWallDetectedTime >= 0.5 then
             currentAllowedSpeed = 30
         end
         
-        -- Yield for exactly one frame and get the precise elapsed time (dt)
         local dt = RunService.Heartbeat:Wait()
         
-        -- Calculate exact distance to travel this frame
         local activeStepDistance = currentAllowedSpeed * dt
         if activeStepDistance > totalDistance then 
             activeStepDistance = totalDistance 
         end
         
-        -- Apply the frame-rate-independent movement
         local nextPosition = currentPos + (direction * activeStepDistance)
         humanoidRootPart.CFrame = CFrame.new(nextPosition.X, lockedYHeight, nextPosition.Z)
         humanoidRootPart.AssemblyLinearVelocity = Vector3_zero
@@ -329,35 +294,49 @@ local function Main()
 
     Log("Waiting for fuels to load", "[MAIN] : ")
     while true do
-      local children = DroppedItemsFolder:GetChildren()
-      local count = 0
-      local FuelLoaded = 0
-      for _, child in ipairs(children) do
-        if child.Name == "Fuel" then FuelLoaded = FuelLoaded + 1 end
-      end
-      if FuelLoaded >= 5 then break end
-      task.wait(0.2)
+        local children = DroppedItemsFolder:GetChildren()
+        local FuelLoaded = 0
+        for _, child in ipairs(children) do
+            if child.Name == "Fuel" then FuelLoaded = FuelLoaded + 1 end
+        end
+        if FuelLoaded >= 5 then break end
+        task.wait(0.2)
     end
     task.wait(1)
 
     Log("Starting the Farm", "[MAIN] : ")
     Log("===================================================================", "")
     local StartTime = os.clock()
-    getGeneratorPosition()
-    local TwoFuels = FindShortPath()
-    local fuel1 = TwoFuels[1]
-    local fuel2 = TwoFuels[2]
+	local attempt = 1
+	local TwoFuels, fuel1, fuel2
+
+	while attempt <= 10 do
+		getGeneratorPosition()
+		TwoFuels = FindShortPath()
+        fuel1 = TwoFuels[1]
+        fuel2 = TwoFuels[2]
+		
+		if fuel1 and fuel2 and chosenBox then break end
+		Log(string.format("Map items not ready (Attempt %d/%d). Retrying in 1.0s...", attempt, 10), "[ANOMALY] : ")
+		task.wait(1.0)
+		attempt = attempt + 1
+	end
+	if not fuel1 or not fuel2 or not chosenBox then
+        Log("Assets failed to load (make sure to add task.wait(seconds) on top of loadstring), restarting the run", "[ANOMALY] : ")
+		PlayAgainRemote:FireServer()
+		return
+    end
 
     -- Go to first fuel
     Log("Going to the first fuel", "[MAIN] : ")
     GoTo(fuel1:GetPivot().Position)
     task.wait(0.2)
     FuelTeleport(fuel1)
-    print()
     Log(string.format("Going to Fuel 1 completion: %.2f seconds", os.clock() - StartTime), "[MAIN] : ")
     Log("===================================================================", "")
     task.wait(0.1)
 
+    -- Go to second fuel
     Log("Going to the second fuel", "[MAIN] : ")
     GoTo(fuel2:GetPivot().Position)
     task.wait(0.2)
@@ -366,21 +345,27 @@ local function Main()
     Log("===================================================================", "")
     task.wait(0.1)
 
+    -- Go to Power Box
     Log("Going to the Power Plant", "[MAIN] : ")
     GoTo(chosenBox:GetPivot().Position)
-    Log(string.format("Going to Fuel 2 completion: %.2f seconds", os.clock() - StartTime), "[MAIN] : ")
+    -- FIXED: Fixed mismatched destination tracking strings in runtime splits
+    Log(string.format("Arrived at Power Plant Box: %.2f seconds", os.clock() - StartTime), "[MAIN] : ")
     Log("===================================================================", "")
 
     local Prompt = chosenBox:WaitForChild("Prompt")
     local SparkObject = chosenBox:WaitForChild("Door"):WaitForChild("Doorpart1"):WaitForChild("Sparks")
     if fireproximityprompt then
-      while true do
-        local SparkActive = SparkObject.Enabled
-        fireproximityprompt(Prompt)
-        if not SparkActive then break end
-        task.wait(0.1)
-      end
-    else Log("The fireproximityprompt is unsupported on your executor, RIP", "[SYSTEM] : ")
+        -- FIXED: Added a maximum iteration escape gate to safeguard against infinite prompt activation locks
+        local checks = 0
+        while checks < 50 do
+            local SparkActive = SparkObject.Enabled
+            fireproximityprompt(Prompt)
+            if not SparkActive then break end
+            task.wait(0.1)
+            checks = checks + 1
+        end
+    else 
+        Log("The fireproximityprompt is unsupported on your executor, RIP", "[SYSTEM] : ")
     end
     Log("Power Box has been fixed", "[MAIN] : ")
     Log("===================================================================", "")
@@ -395,42 +380,35 @@ end
 SpawnPlatform()
 Noclip()
 
--- Mod joined? RUUNNN
 if #Players:GetPlayers() > 1 then
     evacuateServer("Pre-existing player DETECTED!")
 end
--- Hire a security man for any sussy people
+
 Players.PlayerAdded:Connect(function(newPlayer)
     if newPlayer ~= LocalPlayer then
         evacuateServer("Player (" .. newPlayer.Name .. ") entering the server DETECTED!")
     end
 end)
 
--- If a run somehow fails (either finding fuel function broke or smth), it will do a fresh new run
 task.spawn(function()
-    task.wait(40.0) -- Timeout limit
- 
+    task.wait(40.0) 
     if PlayAgainRemote then
         Log("The run is taking too long, restarting the run", "[ANOMALY] : ")
-        local error = nil
-        success, error = pcall(function() PlayAgainRemote:FireServer() end)
+        pcall(function() PlayAgainRemote:FireServer() end)
     end
 end)
 
--- If PlayAgain remote SOMEHOW broke, just teleport to lobby
 task.spawn(function()
-  task.wait(45.0) -- Timeout limit
-
-  local LobbyID = 90148635862803 
-  local TeleportService = game:GetService("TeleportService")
-  Log("Failed to initiate (Play Again), returning to lobby", "[ANOMALY] : ")
-  pcall(function() TeleportService:Teleport(LobbyID, LocalPlayer) end)
+    task.wait(45.0) 
+    local LobbyID = 90148635862803 
+    local TeleportService = game:GetService("TeleportService")
+    Log("Failed to initiate (Play Again), returning to lobby", "[ANOMALY] : ")
+    pcall(function() TeleportService:Teleport(LobbyID, LocalPlayer) end)
 end)
  
--- If you somehow died, it will do a fresh new run
-LocalPlayer.Character:GetAttributeChangedSignal("Dead"):Connect(function()
-  Log("You died, restarting the run", "[ANOMALY] : ")
-  pcall(function() PlayAgainRemote:FireServer() end)
+character:GetAttributeChangedSignal("Dead"):Connect(function()
+    Log("You died, restarting the run", "[ANOMALY] : ")
+    pcall(function() PlayAgainRemote:FireServer() end)
 end)
  
 Main()
