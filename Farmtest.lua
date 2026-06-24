@@ -28,6 +28,7 @@ local humanoidRootPart     = getgenv().humanoidRootPart
 local humanoid             = getgenv().humanoid
 local character            = getgenv().character
 local LocalPlayer          = getgenv().LocalPlayer
+local FILE_NAME			   = getgenv().FILE_NAME
 
 local Generator = nil
 local chosenBox = nil
@@ -43,6 +44,25 @@ local function Log(message, linebreaker)
         while not LogToTerminal do task.wait(0.05) end
         LogToTerminal(message, linebreaker)
     end)
+end
+
+local function WriteData(logString)
+    local content = isfile(FILE_NAME) and readfile(FILE_NAME) or ""
+    local lines = string.split(content, "\n")
+    
+    local activeLogs = {}
+    for _, val in ipairs(lines) do
+        if val ~= "" then table.insert(activeLogs, val) end
+    end
+    
+    if #activeLogs >= 500 then
+        table.remove(activeLogs, 1)
+    end
+    
+    table.insert(activeLogs, logString)
+    
+    local savedString = table.concat(activeLogs, "\n") .. "\n"
+    writefile(FILE_NAME, savedString)
 end
  
 -- --- Safety and Escape Protocols ---
@@ -281,6 +301,8 @@ local function GoDown()
     end
 end
 
+local function SafeWrite(logline) pcall(WriteData, logline) end
+
 -- --- PIPELINE EXECUTION ENGINE ---
 local function Main()
     Log("===================================================================", "")
@@ -372,6 +394,7 @@ local function Main()
 
     local FinishTime = os.clock() - StartTime
     Log(string.format("🏆 TOTAL RUN TIME SUMMARY: %.2f seconds", FinishTime), "[MAIN] : ")
+	SafeWrite(string.format("[ RUN SUCCESSFUL ] : Completed in %.2f seconds", FinishTime))
     task.wait(0.1)
     Log("Run finished, starting a new run", "[SYSTEM] : ")
     pcall(function() PlayAgainRemote:FireServer() end)
@@ -381,11 +404,15 @@ SpawnPlatform()
 Noclip()
 
 if #Players:GetPlayers() > 1 then
+	for _, ply in ipairs(Players:GetPlayers()) do
+        if ply ~= LocalPlayer then SafeWrite("[ WARNING ] : Player " .. ply.Name .. " has entered the Server") end
+    end
     evacuateServer("Pre-existing player DETECTED!")
 end
 
 Players.PlayerAdded:Connect(function(newPlayer)
     if newPlayer ~= LocalPlayer then
+		SafeWrite("[ WARNING ] : Player " .. newPlayer.Name .. " has entered the Server")
         evacuateServer("Player (" .. newPlayer.Name .. ") entering the server DETECTED!")
     end
 end)
@@ -393,7 +420,7 @@ end)
 task.spawn(function()
     task.wait(40.0) 
     if PlayAgainRemote then
-        Log("The run is taking too long, restarting the run", "[ANOMALY] : ")
+        SafeWrite("[ ANOMALY ] : You took too long in a run, something went wrong!")
         pcall(function() PlayAgainRemote:FireServer() end)
     end
 end)
@@ -407,7 +434,7 @@ task.spawn(function()
 end)
  
 character:GetAttributeChangedSignal("Dead"):Connect(function()
-    Log("You died, restarting the run", "[ANOMALY] : ")
+    SafeWrite("[ ANOMALY ] : You died in a run, something went wrong!")
     pcall(function() PlayAgainRemote:FireServer() end)
 end)
  
