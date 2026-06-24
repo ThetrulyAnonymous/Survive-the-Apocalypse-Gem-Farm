@@ -8,8 +8,8 @@ local character       = getgenv().character
 local TargetContainer = getgenv().TargetContainer
 local MapFolder       = getgenv().MapFolder
 local TilesFolder     = getgenv().TilesFolder
-local FILE_NAME = "PrevRunData.txt"
-local CONFIG_FILE = "FarmConfig.txt"
+local FILE_NAME = getgenv().FILE_NAME
+local CONFIG_FILE = getgenv().CONFIG_FILE
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ApocalypseControlPanel"
