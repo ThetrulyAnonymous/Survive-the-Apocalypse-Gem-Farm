@@ -1,3 +1,16 @@
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer     = getgenv().LocalPlayer
+local character       = getgenv().character
+local TargetContainer = getgenv().TargetContainer
+local MapFolder       = getgenv().MapFolder
+local TilesFolder     = getgenv().TilesFolder
+local FILE_NAME       = getgenv().FILE_NAME
+local CONFIG_FILE     = getgenv().CONFIG_FILE
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ApocalypseControlPanel"
 ScreenGui.IgnoreGuiInset = true 
