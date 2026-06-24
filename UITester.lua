@@ -10,7 +10,7 @@ local MapFolder       = getgenv().MapFolder
 local TilesFolder     = getgenv().TilesFolder
 local FILE_NAME = "PrevRunData.txt"
 local CONFIG_FILE = "FarmConfig.txt"
-print(TargetContainer)
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ApocalypseControlPanel"
 ScreenGui.IgnoreGuiInset = true 
