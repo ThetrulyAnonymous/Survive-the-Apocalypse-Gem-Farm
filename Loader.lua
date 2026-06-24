@@ -35,7 +35,7 @@ crawlRaycastParams.CollisionGroup = "Default"
 local FILE_NAME = "PrevRunData.txt"
 local CONFIG_FILE = "FarmConfig.txt"
 
-if not isfile(FILE_NAME) then writefile(FILE_NAME, ) end
+if not isfile(FILE_NAME) then writefile(FILE_NAME, "") end
 
 if not isfile(CONFIG_FILE) then
     local defaultSettings = {HideNameActive = false, OptimisedFarmActive = false, KeySystem = false}
