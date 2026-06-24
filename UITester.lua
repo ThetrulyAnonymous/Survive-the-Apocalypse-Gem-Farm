@@ -448,21 +448,26 @@ local function DataManager()
     local Character = CharacterFolder:WaitForChild(LocalPlayer.Name)
     local Humanoid = Character:WaitForChild("Humanoid")
 
-    GemCountLabel.Text = "TOTAL GEMS: " .. tostring(LocalPlayer:GetAttribute("Gems") or 0)
     local activeClass = LocalPlayer:GetAttribute("Class") or "None"
     ClassLabel.Text = "Current Class: " .. tostring(activeClass)
 
+    local function SyncGem()
+        GemCountLabel.Text = "TOTAL GEMS: " .. tostring(LocalPlayer:GetAttribute("Gems") or 0)
+    end
     local function SyncHealth()
-        local health = Humanoid:GetAttribute("Health") or 100
+        local health = Humanoid.Health or 100
         HealthLabel.Text = "Health: " .. tostring(math.round(health))
     end
     local function SyncHunger()
         local hunger = Character:GetAttribute("Hunger") or 100
         HungerLabel.Text = "Hunger: " .. tostring(math.round(hunger))
     end
-    Humanoid:GetAttributeChangedSignal("Health"):Connect(SyncHealth)
-    Character:GetAttributeChangedSignal("Hunger"):Connect(SyncHunger)
     
+    Humanoid::GetPropertyChangedSignal("Health"):Connect(SyncHealth)
+    Character:GetAttributeChangedSignal("Hunger"):Connect(SyncHunger)
+    LocalPlayer:GetAttributeChangedSignal("Gems"):Connect(SyncGem)
+    
+    SyncGem()
     SyncHealth()
     SyncHunger()
 end
@@ -649,7 +654,7 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    task.wait(2.5) 
+    task.wait(3) 
     pcall(function() 
         RunService:Set3dRenderingEnabled(false) 
     end)
