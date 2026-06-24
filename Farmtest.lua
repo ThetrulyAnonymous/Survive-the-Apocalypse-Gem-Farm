@@ -28,7 +28,7 @@ local humanoidRootPart     = getgenv().humanoidRootPart
 local humanoid             = getgenv().humanoid
 local character            = getgenv().character
 local LocalPlayer          = getgenv().LocalPlayer
-local FILE_NAME			   = getgenv().FILE_NAME
+local FILE_NAME = "PrevRunData.txt"
 
 local Generator = nil
 local chosenBox = nil
