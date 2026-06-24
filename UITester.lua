@@ -34,6 +34,7 @@ if Config_Data.OptimisedFarmActive then
     MinimalGui.IgnoreGuiInset = true
     MinimalGui.ResetOnSpawn = false
     MinimalGui.Parent = TargetContainer
+    MinimalGui.DisplayOrder = -99
 
     local BlackScreen = Instance.new("Frame")
     BlackScreen.Size = UDim2.new(1, 0, 1, 0)
