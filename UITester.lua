@@ -1,7 +1,7 @@
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ApocalypseControlPanel"
-ScreenGui.IgnoreGuiInset = true -- Covers top of screen completely
-ScreenGui.DisplayOrder = -1      -- Allows Roblox menus to draw over it
+ScreenGui.IgnoreGuiInset = true 
+ScreenGui.DisplayOrder = -1      
 ScreenGui.ResetOnSpawn = false   
 ScreenGui.Parent = TargetContainer
 
@@ -30,7 +30,7 @@ MainBackground.Name = "MainBackground"
 MainBackground.Size = UDim2.new(1, 0, 1, 0)
 MainBackground.BackgroundColor3 = BG_COLOR
 MainBackground.ZIndex = 1
-MainBackground.ClipsDescendants = true -- Optimizes GPU by hiding hidden background layers
+MainBackground.ClipsDescendants = true 
 MainBackground.Parent = ScreenGui
 
 -- --- 3. TOP NAVIGATION CONTAINERS (ENLARGED SCREEN HEADER) ---
@@ -145,14 +145,13 @@ MapPanel.ZIndex = 3
 MapPanel.Parent = MainBackground
 ApplyCyberBorder(MapPanel)
 
--- Added: Custom Title Banner matching terminal panels style requirements
 local MapTitle = Instance.new("TextLabel")
 MapTitle.Name = "MapTitle"
-MapTitle.Size = UDim2.new(1, -10, 0, 35) -- Increased height from 25 to 35
+MapTitle.Size = UDim2.new(1, -10, 0, 35) 
 MapTitle.Position = UDim2.new(0, 10, 0, 5)
 MapTitle.BackgroundTransparency = 1
 MapTitle.Font = Enum.Font.Sarpanch
-MapTitle.TextSize = 26 -- Enriched size from 20 to 26
+MapTitle.TextSize = 26 
 MapTitle.TextColor3 = NEON_CYAN
 MapTitle.Text = "LIVE MAP (ABOVE VIEW)"
 MapTitle.TextXAlignment = Enum.TextXAlignment.Left
@@ -161,12 +160,12 @@ MapTitle.Parent = MapPanel
 
 local MapScreen = Instance.new("ViewportFrame")
 MapScreen.Name = "MapScreen"
-MapScreen.Size = UDim2.new(1, -16, 1, -50) -- Adjusted scaling to clear room for larger title
+MapScreen.Size = UDim2.new(1, -16, 1, -50) 
 MapScreen.Position = UDim2.new(0, 8, 0, 42) 
 MapScreen.BackgroundColor3 = Color3.fromRGB(6, 8, 12) 
-MapScreen.Ambient = Color3.fromRGB(180, 185, 195)       
+MapScreen.Ambient = Color3.fromRGB(180, 185, 195)        
 MapScreen.LightColor = Color3.fromRGB(230, 225, 215)    
-MapScreen.LightDirection = Vector3.new(0.2, -1, 0.2)   
+MapScreen.LightDirection = Vector3.new(0.2, -1, 0.2)    
 MapScreen.BorderSizePixel = 0
 MapScreen.ZIndex = 4
 MapScreen.Parent = MapPanel
@@ -193,10 +192,10 @@ task.spawn(function()
     if not MapFolder then return end
     if not TilesFolder then return end
 
-    local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+    local HumanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
     LocalPlayer.CharacterAdded:Connect(function(NewChar)
-        Character = NewChar
+        getgenv().character = NewChar
         HumanoidRootPart = NewChar:WaitForChild("HumanoidRootPart")
     end)
     
@@ -239,20 +238,17 @@ TerminalPanel.Parent = MainBackground
 ApplyCyberBorder(TerminalPanel)
 
 local LogTitle = Instance.new("TextLabel")
-LogTitle.Size = UDim2.new(1, -10, 0, 35) -- Increased height bounds
+LogTitle.Size = UDim2.new(1, -10, 0, 35) 
 LogTitle.Position = UDim2.new(0, 10, 0, 5)
 LogTitle.BackgroundTransparency = 1
 LogTitle.Font = Enum.Font.Sarpanch
-LogTitle.TextSize = 26 -- Enriched size from 20 to 26
+LogTitle.TextSize = 26 
 LogTitle.TextColor3 = NEON_CYAN
 LogTitle.Text = "TERMINAL LOGS"
-LogTitle.TextXAlignment = Enum.TextXAlignment.Left -- Left-aligned to match the map radar title exactly
+LogTitle.TextXAlignment = Enum.TextXAlignment.Left 
 LogTitle.ZIndex = 4
 LogTitle.Parent = TerminalPanel
 
-local LogScrollFrame = Instance.new("ScrollingFrame")
-LogScrollFrame.Name = "TerminalLogs"
-LogScrollFrame.BackgroundColor3 = Color3.fromRGB(6, 8, 12)
 local LogScrollFrame = Instance.new("ScrollingFrame")
 LogScrollFrame.Name = "TerminalLogs"
 LogScrollFrame.BackgroundColor3 = Color3.fromRGB(6, 8, 12)
@@ -267,31 +263,28 @@ UIList.SortOrder = Enum.SortOrder.LayoutOrder
 UIList.Padding = UDim.new(0, 3)
 UIList.Parent = LogScrollFrame
 
-local UserPanel = Instance.new("ScrollingFrame") -- ✅ UPDATED: Converted from Frame to ScrollingFrame
+local UserPanel = Instance.new("ScrollingFrame") 
 UserPanel.Name = "UserPanel"
 UserPanel.BackgroundColor3 = PANEL_COLOR
 UserPanel.ZIndex = 3
 UserPanel.Parent = MainBackground
 ApplyCyberBorder(UserPanel)
 
--- Configuration metrics for smooth inner-card navigation
 UserPanel.BorderSizePixel = 0
-UserPanel.ScrollBarThickness = 5 -- Clean, thin scroll track
-UserPanel.ScrollBarImageColor3 = NEON_CYAN or Color3.fromRGB(0, 243, 255)
-UserPanel.AutomaticCanvasSize = Enum.AutomaticSize.Y -- ✅ FORCES canvas size to grow if text gets packed
-UserPanel.CanvasSize = UDim2.new(0, 0, 0, 0) -- Starts at zero, expands naturally
+UserPanel.ScrollBarThickness = 5 
+UserPanel.ScrollBarImageColor3 = NEON_CYAN
+UserPanel.AutomaticCanvasSize = Enum.AutomaticSize.Y 
+UserPanel.CanvasSize = UDim2.new(0, 0, 0, 0) 
 
--- Added: Standard inner padding so your text lines don't hug the frame edges tightly
 local UserPadding = Instance.new("UIPadding")
 UserPadding.PaddingLeft = UDim.new(0, 10)
 UserPadding.PaddingTop = UDim.new(0, 10)
-UserPadding.PaddingBottom = UDim.new(0, 15) -- Breathing room at the absolute bottom
+UserPadding.PaddingBottom = UDim.new(0, 15) 
 UserPadding.Parent = UserPanel
 
 local ProfilePic = Instance.new("ImageLabel")
 ProfilePic.Name = "ProfilePic"
 ProfilePic.Size = UDim2.new(0, 80, 0, 80)
--- FIXED: Changed X position from 15 to 5 because our new UIPadding already handles the margin!
 ProfilePic.Position = UDim2.new(0, 5, 0, 5) 
 ProfilePic.BackgroundColor3 = Color3.fromRGB(20, 25, 35)
 ProfilePic.ZIndex = 4
@@ -301,7 +294,6 @@ ApplyCyberBorder(ProfilePic, NEON_CYAN or Color3.fromRGB(0, 243, 255))
 local function CreateCombinedStatLine(text, positionY, color, fontSize)
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -95, 0, 20)
-    -- FIXED: Adjusted X position from 105 to 95 to account for the parent frame padding shift
     label.Position = UDim2.new(0, 100, 0, positionY)
     label.BackgroundTransparency = 1
     label.Font = Enum.Font.Code
@@ -325,11 +317,9 @@ local ClassLabel = CreateCombinedStatLine("Current Class: None", 64, Color3.from
 local HealthLabel = CreateCombinedStatLine("Health: 100", 86, Color3.fromRGB(23, 230, 37))
 local HungerLabel = CreateCombinedStatLine("Hunger: 100", 107, Color3.fromRGB(230, 164, 23)) 
 
--- Safety color palette fallbacks if not inherited from master script globally
 local ACCENT_CYAN = NEON_CYAN or Color3.fromRGB(0, 243, 255)
 local ACCENT_GREEN = MAT_GREEN or Color3.fromRGB(0, 255, 140)
 
--- Option A: Hide Username Button
 local HideNameBtn = Instance.new("TextButton")
 HideNameBtn.Name = "HideNameBtn"
 HideNameBtn.Size = UDim2.new(1, -120, 0, 20)
@@ -343,7 +333,6 @@ HideNameBtn.Text = "[ ] Hide Username"
 HideNameBtn.ZIndex = 4
 HideNameBtn.Parent = UserPanel
 
--- Option B: Super Farming Mode Core Wrapper
 local OptimisedFarmBtn = Instance.new("TextButton")
 OptimisedFarmBtn.Name = "OptimisedFarmBtn"
 OptimisedFarmBtn.Size = UDim2.new(1, -120, 0, 20)
@@ -357,7 +346,6 @@ OptimisedFarmBtn.Text = "[ ] Optimised Farming Mode"
 OptimisedFarmBtn.ZIndex = 4
 OptimisedFarmBtn.Parent = UserPanel
 
--- Option B Sub-Caption Subtext Description
 local OptimisedFarm = Instance.new("TextLabel")
 OptimisedFarm.Name = "OptimisedFarmtext"
 OptimisedFarm.Size = UDim2.new(1, -50, 0, 80)
@@ -373,7 +361,6 @@ OptimisedFarm.Text = "Note: Enabling this will replace the current UI with low-q
 OptimisedFarm.ZIndex = 4
 OptimisedFarm.Parent = UserPanel
 
--- Instantiated as a core screen child nested inside MapPanel bounds
 local PreviousRunsPanel = Instance.new("ScrollingFrame")
 PreviousRunsPanel.Name = "PreviousRunsPanel"
 PreviousRunsPanel.Size = UDim2.new(1, -16, 1, -40)
@@ -425,17 +412,15 @@ end
 RecalculateMonitorLayout()
 MainBackground:GetPropertyChangedSignal("AbsoluteSize"):Connect(RecalculateMonitorLayout)
 
-local function LogToTerminal(message, linebreaker)
+getgenv().LogToTerminal = function(message, header)
     local LogLine = Instance.new("TextLabel")
-    local starter = ""
-    if not linebreaker then starter = "[SYSTEM] : " end
     LogLine.Size = UDim2.new(1, -10, 0, 25)
     LogLine.BackgroundTransparency = 1
     LogLine.Font = Enum.Font.Code
     LogLine.TextSize = 18
     LogLine.TextColor3 = MAT_GREEN
     LogLine.TextXAlignment = Enum.TextXAlignment.Left
-    LogLine.Text = starter .. tostring(message)
+    LogLine.Text = header .. tostring(message)
     LogLine.ZIndex = 5
     LogLine.Parent = LogScrollFrame
     
@@ -445,13 +430,10 @@ local function LogToTerminal(message, linebreaker)
 end
 LogToTerminalPanel = LogToTerminal
 
-
-UpdateGemsPerHour = function(rate) GemsPerHourLabel.Text = "GEMS PER HOUR: " .. tostring(rate) end
-
 local function DataManager()
     local CharacterFolder = Workspace:WaitForChild("Characters")
-    local Character = Workspace.Characters:WaitForChild(LocalPlayer.Name)
-    local Humanoid = Character:WaitForChild("Humanoid", 2)
+    local Character = CharacterFolder:WaitForChild(LocalPlayer.Name)
+    local Humanoid = Character:WaitForChild("Humanoid")
 
     GemCountLabel.Text = "TOTAL GEMS: " .. tostring(LocalPlayer:GetAttribute("Gems") or 0)
     local activeClass = LocalPlayer:GetAttribute("Class") or "None"
@@ -475,10 +457,8 @@ end
 task.spawn(pcall, DataManager)
 
 -- --- CONFIGURATION PERSISTENCE CORE MODULE ---
-
 local function LoadConfigProfile()
     if isfile(CONFIG_FILE) then
-        -- FIXED: Changed JSONEncode to JSONDecode so it safely reads text back into tables
         local success, data = pcall(function() return HttpService:JSONDecode(readfile(CONFIG_FILE)) end)
         if success and type(data) == "table" then return data end
     end
@@ -489,9 +469,7 @@ local function SaveConfigProfile(configData)
     writefile(CONFIG_FILE, HttpService:JSONEncode(configData)) 
 end
 
--- FIXED: Unified the target profile variable name to Config_Data cleanly
 local Config_Data = LoadConfigProfile()
-
 local OptimisedFarmEnabled = Config_Data.OptimisedFarmActive
 
 local function ChangeUser()
@@ -499,12 +477,12 @@ local function ChangeUser()
         HideNameBtn.Text = "[X] Hide Username"
         HideNameBtn.TextColor3 = ACCENT_CYAN
         UsernameLabel.Text = "The Gem Farmer"
-        LogToTerminal("Successfully hides the username", false)
+        LogToTerminal("Successfully hides the username", "[SYSTEM] : ")
     else
         HideNameBtn.Text = "[ ] Hide Username"
         HideNameBtn.TextColor3 = Color3.fromRGB(180, 190, 200)
         UsernameLabel.Text = LocalPlayer.Name 
-        LogToTerminal("Successfully unhides the username", false)
+        LogToTerminal("Successfully unhides the username", "[SYSTEM] : ")
     end
 end
 
@@ -513,19 +491,17 @@ local function OptimisedFarming()
         OptimisedFarmBtn.Text = "[X] Optimised Farming Mode"
         OptimisedFarmBtn.TextColor3 = ACCENT_GREEN
         OptimisedFarmEnabled = true
-        LogToTerminal("ENABLED OPTIMISED FARM MODE! THIS WILL ONLY AFFECT UPCOMING RUNS", false)
+        LogToTerminal("ENABLED OPTIMISED FARM MODE! THIS WILL ONLY AFFECT UPCOMING RUNS", "[SYSTEM] : ")
     else
         OptimisedFarmBtn.Text = "[ ] Optimised Farming Mode"
         OptimisedFarmBtn.TextColor3 = Color3.fromRGB(180, 190, 200)
         OptimisedFarmEnabled = false
-        LogToTerminal("OPTIMISED FARM MODE DISABLED!", false)
+        LogToTerminal("OPTIMISED FARM MODE DISABLED!", "[SYSTEM] : ")
     end
 end
 
--- Run visual baseline updates instantly on startup pass
 OptimisedFarming()
 
--- Dynamic Button Interaction Hook Ports
 HideNameBtn.MouseButton1Click:Connect(function()
     Config_Data.HideNameActive = not Config_Data.HideNameActive
     SaveConfigProfile(Config_Data)
@@ -538,7 +514,6 @@ OptimisedFarmBtn.MouseButton1Click:Connect(function()
     OptimisedFarming()
 end)
 
-
 -- ===================================================================
 -- --- PART 4: FILESYSTEM HANDLERS & NAVIGATION PIPELINES ---
 -- ===================================================================
@@ -547,9 +522,9 @@ PreviousRunsPanel.ScrollBarThickness = 5
 PreviousRunsPanel.ScrollBarImageColor3 = NEON_CYAN
 
 local function RenderFileLogsToTab()
-    -- Clear out all older text label chunks cleanly
+    -- FIXED: Cleaned up the undefined variable safety check edge case loop rule
     for _, child in ipairs(PreviousRunsPanel:GetChildren()) do
-        if child:IsA("TextLabel") and child ~= PrevRunsTitle then 
+        if child:IsA("TextLabel") then 
             child:Destroy() 
         end
     end
@@ -561,7 +536,6 @@ local function RenderFileLogsToTab()
     local validLineIndex = 1
     local currentChunkIndex = 1
     
-    -- Helper function to generate a fast rich text box chunk natively
     local function CreateTextChunk(linesArray, index)
         local ChunkLabel = Instance.new("TextLabel")
         ChunkLabel.Name = "Chunk_" .. tostring(index)
@@ -572,7 +546,7 @@ local function RenderFileLogsToTab()
         ChunkLabel.TextXAlignment = Enum.TextXAlignment.Left
         ChunkLabel.TextYAlignment = Enum.TextYAlignment.Top
         ChunkLabel.RichText = true
-        ChunkLabel.AutomaticSize = Enum.AutomaticSize.Y -- Perfectly matches the small chunk height
+        ChunkLabel.AutomaticSize = Enum.AutomaticSize.Y 
         ChunkLabel.Size = UDim2.new(1, -16, 0, 0)
         ChunkLabel.ZIndex = 5
         ChunkLabel.LayoutOrder = index
@@ -582,31 +556,29 @@ local function RenderFileLogsToTab()
     
     for _, lineText in ipairs(lines) do
         if lineText ~= "" then
-            local hexColor = "rgb(180, 190, 200)" -- Default silver gray
+            local hexColor = "#B4BEC8" 
             
             if string.find(lineText, "SUCCESSFUL") then
-                hexColor = "rgb(0, 255, 140)"    -- Matrix Green
+                hexColor = "#00FF8C"    
             elseif string.find(lineText, "ANOMALY") then
-                hexColor = "rgb(255, 140, 0)"    -- Neon Orange
+                hexColor = "#FF8C00"    
             elseif string.find(lineText, "WARNING") then
-                hexColor = "rgb(255, 40, 80)"    -- Alert Red
+                hexColor = "#FF2850"    
             end
             
             local formattedLine = string.format("<font color=\"%s\">%03d. %s</font>", hexColor, validLineIndex, lineText)
             table.insert(chunkLines, formattedLine)
             
-            -- Every 50 lines, create a separate text frame container to stay far below the pixel limit
             if #chunkLines >= 50 then
                 CreateTextChunk(chunkLines, currentChunkIndex)
                 currentChunkIndex = currentChunkIndex + 1
-                chunkLines = {} -- Clear the temporary table container array
+                chunkLines = {} 
             end
             
             validLineIndex = validLineIndex + 1
         end
     end
     
-    -- Pick up any remaining left over lines at the end of the file loop
     if #chunkLines > 0 then
         CreateTextChunk(chunkLines, currentChunkIndex)
     end
@@ -667,9 +639,6 @@ end
 MainTabBtn.MouseButton1Click:Connect(function() SwitchToTab("MAIN") end)
 PrevTabBtn.MouseButton1Click:Connect(function() SwitchToTab("PREV_RUNS") end)
 
--- Asynchronous Threads Initializers
-task.spawn(pcall, SyncGameAttributes)
-
 task.spawn(function()
     local startEpoch = os.time()
     while task.wait(1) do
@@ -683,14 +652,13 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    task.wait(2.5) -- The 2.5-second safe stabilization yield cushion
+    task.wait(2.5) 
     pcall(function() 
         RunService:Set3dRenderingEnabled(false) 
     end)
-    LogToTerminal("3D RENDERING HAS BEEN DISABLED, YOUR DEVICE WILL NO LONGER OVERHEAT", false)
+    LogToTerminal("3D RENDERING HAS BEEN DISABLED, YOUR DEVICE WILL NO LONGER OVERHEAT", "[SYSTEM] : ")
 end)
 
--- Fetch User Portrait Assets Async with Warmup Buffer
 task.spawn(function()
     ChangeUser()
     task.wait(2)
@@ -702,4 +670,4 @@ task.spawn(function()
     end)
 end)
 
-LogToTerminal("SYSTEM FULLY SYNCED AND OPERATIONAL", false)
+LogToTerminal("SYSTEM FULLY SYNCED AND OPERATIONAL", "[SYSTEM] : ")
